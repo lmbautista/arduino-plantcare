@@ -192,7 +192,13 @@ void PostWetStatus(int wetSensorIdx)
     Serial.println(wet);
 
     String params = String(F("{\"wet_sensor_field\":\"")) + wetSensorField + String(F("\",\"wet\":")) + wet + F("}");
-    String request = String(F("POST /v1/arduino/wet_statuses HTTP/1.1\r\n")) + F("Host: api.yourplantcare.com\r\n") + F("Authorization: Token ") + token + F("\r\n") + F("Content-Type: application/json\r\n") + F("Content-Length: ") + params.length() + F("\r\n") + F("Connection: close\r\n\r\n") + params + "\r\n";
+    String request = String(F("POST /v1/arduino/wet_statuses HTTP/1.1\r\n"))
+                     + F("Host: api.yourplantcare.com\r\n")
+                     + F("Authorization: Token ") + token + F("\r\n")
+                     + F("Content-Type: application/json\r\n")
+                     + F("Content-Length: ") + params.length() + F("\r\n")
+                     + F("Connection: close\r\n\r\n")
+                     + params + "\r\n";
 
     HttpResponse response = SendHttpRequest(request);
 
@@ -230,8 +236,11 @@ void GetWaterPumpStatus()
   SerialESP8266.println(F("AT+CIPSTART=\"TCP\",\"api.yourplantcare.com\",80"));
   if (SerialESP8266.find("OK") || SerialESP8266.find("ALREADY CONNECTED"))
   {
-    Serial.println(F("ESP8266 connected to server..."));
-    String request = String(F("POST /v1/arduino/watering_consumers/ HTTP/1.1\r\n")) + F("Host: api.yourplantcare.com\r\n") + F("Connection: close\r\n") + F("Authorization: Token ") + token + F("\r\n\r\n");
+    Serial.println(F("ESP8266 connected to server"));
+    String request = String(F("POST /v1/arduino/watering_consumers/ HTTP/1.1\r\n"))
+                     + F("Host: api.yourplantcare.com\r\n")
+                     + F("Connection: close\r\n")
+                     + F("Authorization: Token ") + token + F("\r\n\r\n");
 
     HttpResponse response = SendHttpRequest(request);
 
@@ -287,6 +296,10 @@ HttpResponse GetHttpResponse()
     if (line.indexOf(F("HTTP/1.1 404 Not Found")) >= 0)
     {
       response.httpStatus = "404";
+    }
+    if (line.indexOf(F("HTTP/1.1 401 Unauthorized")) >= 0)
+    {
+      response.httpStatus = "401";
     }
     if (line.indexOf(F("HTTP/1.1 500 Internal Server Error")) >= 0)
     {
